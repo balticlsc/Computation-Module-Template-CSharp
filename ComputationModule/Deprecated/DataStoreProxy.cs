@@ -1,4 +1,6 @@
-﻿namespace ComputationModule.Model
+﻿using ComputationModule.BalticLSC;
+
+namespace ComputationModule.Model
 {
     public class DataStoreProxy
     {

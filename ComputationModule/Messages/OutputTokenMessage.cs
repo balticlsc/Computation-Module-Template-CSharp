@@ -1,6 +1,6 @@
-﻿namespace ComputationModule.Model.BalticDataModel
+﻿namespace ComputationModule.Messages
 { 
-    public class XOutputTokenMessage
+    public class OutputTokenMessage
     {
         public string PinName { get; set; }
         public string SenderUid { get; set; }

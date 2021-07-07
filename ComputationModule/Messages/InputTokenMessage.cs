@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace ComputationModule.Model.BalticDataModel
+namespace ComputationModule.Messages
 {
-    public class XInputTokenMessage
+    public class InputTokenMessage
     {
         public string MsgUid { get; set; }
 
@@ -12,6 +12,6 @@ namespace ComputationModule.Model.BalticDataModel
 
         public string Values { get; set; }
 
-        public IEnumerable<XSeqToken> TokenSeqStack { get; set; }
+        public IEnumerable<SeqToken> TokenSeqStack { get; set; }
     }
 }

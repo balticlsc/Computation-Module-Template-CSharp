@@ -1,4 +1,4 @@
-﻿namespace ComputationModule.Model.BalticDataModel
+﻿namespace ComputationModule.Messages
 {
     public enum TokenMultiplicity
     {

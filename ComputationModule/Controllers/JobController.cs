@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ComputationModule.BalticLSC;
+using ComputationModule.Messages;
 using ComputationModule.Model;
-using ComputationModule.Model.BalticDataModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -15,7 +16,7 @@ namespace ComputationModule.Controllers
     [Route("/")]
     public class JobController : ControllerBase
     {
-        private ComputationStatus _status;
+        private Status _status;
         private long _progress;
         private List<PinConfiguration> _pins;
         private List<JobTask> _jobTasks;
@@ -38,11 +39,11 @@ namespace ComputationModule.Controllers
         [Route("token")]
         public IActionResult ProcessTokenMessage([FromBody] object value)
         {
-            if (_status != ComputationStatus.Failed)
+            if (_status != Status.Failed)
             {
                 try
                 {
-                    var inputToken = JsonConvert.DeserializeObject<XInputTokenMessage>(value.ToString() ?? "");
+                    var inputToken = JsonConvert.DeserializeObject<InputTokenMessage>(value.ToString() ?? "");
                     var tokens = new TokensProxy(inputToken.MsgUid, inputToken.PinName);
                     try
                     {

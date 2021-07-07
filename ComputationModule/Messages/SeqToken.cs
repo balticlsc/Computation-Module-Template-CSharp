@@ -1,6 +1,6 @@
-﻿namespace ComputationModule.Model.BalticDataModel
+﻿namespace ComputationModule.Messages
 {
-    public class XSeqToken
+    public class SeqToken
     {
         public string SeqUid { get; set; }
 

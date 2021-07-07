@@ -1,8 +1,8 @@
-﻿namespace ComputationModule.Model.BalticDataModel
+﻿namespace ComputationModule.Messages
 {
     public class JobStatus
     {
-        public ComputationStatus Status { get; set; } = ComputationStatus.Unknown;
+        public Status Status { get; set; } = Status.Idle;
         public long JobProgress { get; set; } = -1;
         public string JobInstanceUid { get; set; }
 

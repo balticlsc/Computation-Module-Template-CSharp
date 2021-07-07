@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using ComputationModule.Model.BalticDataModel;
-using Microsoft.Extensions.Configuration;
+using ComputationModule.BalticLSC;
+using ComputationModule.Messages;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -11,7 +10,7 @@ namespace ComputationModule.Model
 {
     public class JobTask
     {
-        public ComputationStatus Status { get; private set; } = ComputationStatus.Idle;
+        public Status Status { get; private set; } = Status.Idle;
         public long Progress { get; private set; } = -1;
         public DataStoreProxy DataStoreProxy;
         private PinConfiguration _pinConfiguration;
@@ -29,7 +28,7 @@ namespace ComputationModule.Model
         public void StartDataProcessing()
         {
             //Set computation status and progress for task, start computations, send output token if necessary
-            Status = ComputationStatus.Working;
+            Status = Status.Working;
             Progress = 0;
 
             try
@@ -41,7 +40,7 @@ namespace ComputationModule.Model
                 _tokensProxy.SendOutputToken(outputData, true);
                 //If all tasks for whole computation module are finished, send ack token, if module has multiple input pins and/or token multiplicity is 
                 //multiple some extended logic behind sending ack token should be implemented
-                Status = ComputationStatus.Completed;
+                Status = Status.Completed;
                 Progress = 100;
                 _tokensProxy.SendAckToken();
             }

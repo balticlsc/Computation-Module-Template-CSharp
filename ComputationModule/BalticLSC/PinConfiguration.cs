@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using ComputationModule.Model.BalticDataModel;
+using ComputationModule.Messages;
 using Microsoft.Extensions.Configuration;
-using MongoDB.Bson.IO;
-using Serilog;
-using JsonConvert = Newtonsoft.Json.JsonConvert;
 
-namespace ComputationModule.Model
+namespace ComputationModule.BalticLSC
 {
     public class PinConfiguration
     {

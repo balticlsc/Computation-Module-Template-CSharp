@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace ComputationModule.Model.BalticDataModel
+namespace ComputationModule.Messages
 {
-    public class XTokensAck {
+    public class TokensAck {
         public List<string> MsgUids { get; set; }
         public string SenderUid { get; set; }
         public string Note { get; set; }

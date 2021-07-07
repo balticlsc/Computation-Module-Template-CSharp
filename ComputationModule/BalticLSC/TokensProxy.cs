@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using ComputationModule.Model.BalticDataModel;
+using ComputationModule.Messages;
 using Newtonsoft.Json;
 
-namespace ComputationModule.Model
+namespace ComputationModule.BalticLSC
 {
     public class TokensProxy
     {
@@ -29,7 +29,7 @@ namespace ComputationModule.Model
 
         public HttpStatusCode SendOutputToken(Dictionary<string, string> handle, bool isFinal)
         {
-            var xOutputToken = new XOutputTokenMessage
+            var xOutputToken = new OutputTokenMessage
             {
                 PinName = _pinName,
                 SenderUid = _senderUid,
@@ -47,7 +47,7 @@ namespace ComputationModule.Model
 
         public HttpStatusCode SendAckToken(bool isFailed = false, string note = null)
         {
-            var ackToken = new XTokensAck
+            var ackToken = new TokensAck
             {
                 SenderUid = _senderUid,
                 MsgUids = new List<string> {_baseMsgUid},

@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
-namespace ComputationModule.Model
+namespace ComputationModule.BalticLSC
 {
     public class ConfigurationHandle
     {
