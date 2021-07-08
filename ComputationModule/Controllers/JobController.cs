@@ -18,20 +18,12 @@ namespace ComputationModule.Controllers
     {
         private Status _status;
         private long _progress;
-        private List<PinConfiguration> _pins;
         private List<JobTask> _jobTasks;
+        private JobRegistryImpl _registry;
         
-        public JobController(IConfiguration config)
+        public JobController(JobRegistryImpl registry)
         {
-            try
-            {
-                _pins = ConfigurationHandle.GetPinsConfiguration(config);
-            }
-            catch (Exception)
-            {
-                Log.Error("Error while parsing configuration.");
-            }
-
+            _registry = registry;
             _jobTasks = new List<JobTask>();
         }
 
@@ -47,7 +39,7 @@ namespace ComputationModule.Controllers
                     var tokens = new TokensProxy(inputToken.MsgUid, inputToken.PinName);
                     try
                     {
-                        var jobTask = new JobTask(_pins.FirstOrDefault(x => x.PinName == inputToken.PinName),
+                        var jobTask = new JobTask(_registry.GetPinConfiguration(inputToken.PinName),
                             tokens, inputToken.Values);
                         var result = jobTask.DataStoreProxy.CheckDataConnections();
                         _jobTasks.Add(jobTask);

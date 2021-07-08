@@ -5,28 +5,22 @@ namespace ComputationModule.BalticLSC
         protected JobRegistry Registry;
         protected DataHandler Data;
 
-        public TokenListener()
+        public TokenListener(JobRegistry registry, DataHandler data)
         {
+            Registry = registry;
+            Data = data;
         }
 
         /// 
         /// <param name="pinName"></param>
-        public void DataReceived(string pinName)
-        {
-        }
+        public abstract void DataReceived(string pinName);
 
         /// 
         /// <param name="pinName"></param>
-        public void OptionalDataReceived(string pinName)
-        {
-        }
+        public abstract void OptionalDataReceived(string pinName);
 
-        public void DataReady()
-        {
-        }
+        public abstract void DataReady();
 
-        public void DataComplete()
-        {
-        }
+        public abstract void DataComplete();
     }
 }

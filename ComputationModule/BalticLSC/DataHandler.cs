@@ -5,7 +5,15 @@ namespace ComputationModule.BalticLSC {
 
 		/// 
 		/// <param name="pinName"></param>
-		object ObtainData(string pinName);
+		string ObtainDataItem(string pinName);
+		
+		/// 
+		/// <param name="pinName"></param>
+		List<string> ObtainDataItems(string pinName);
+		
+		/// 
+		/// <param name="pinName"></param>
+		(List<string>, long[]) ObtainDataItemsNDim(string pinName);
 
 		/// 
 		/// <param name="pinName"></param>

@@ -9,6 +9,7 @@ namespace ComputationModule.BalticLSC
         //Basic pin configuration, could be extended
         public string PinName;
         public string PinType;
+        public string IsRequired;
         public string AccessType;
         public DataMultiplicity DataMultiplicity;
         public TokenMultiplicity TokenMultiplicity;
@@ -18,6 +19,7 @@ namespace ComputationModule.BalticLSC
         {
             PinName = section.GetValue<string>("PinName");
             PinType = section.GetValue<string>("PinType");
+            IsRequired = section.GetValue<string>("IsRequired");
             AccessType = section.GetValue<string>("AccessType");
             DataMultiplicity = (DataMultiplicity)Enum.Parse(typeof(DataMultiplicity),
                 section.GetValue<string>("DataMultiplicity"), true);

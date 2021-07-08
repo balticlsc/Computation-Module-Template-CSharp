@@ -10,7 +10,15 @@ namespace ComputationModule.BalticLSC {
 
 		/// 
 		/// <param name="pinName"></param>
-		object GetPinValues(string pinName);
+		string GetPinValue(string pinName);
+		
+		/// 
+		/// <param name="pinName"></param>
+		List<string> GetPinValues(string pinName);
+		
+		/// 
+		/// <param name="pinName"></param>
+		(List<string>, long[]) GetPinValuesNDim(string pinName);
 
 		/// 
 		/// <param name="pinName"></param>

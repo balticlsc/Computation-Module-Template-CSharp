@@ -14,27 +14,23 @@ namespace ComputationModule.BalticLSC
         private readonly string _batchManagerAckUrl;
         private readonly string _batchManagerTokenUrl;
         private readonly string _senderUid;
-        private readonly string _baseMsgUid;
-        private readonly string _pinName;
-
-        public TokensProxy(string baseMsgUid, string pinName)
+        
+        public TokensProxy()
         {
-            _baseMsgUid = baseMsgUid;
-            _pinName = pinName;
             _httpClient = new HttpClient();
             _senderUid = Environment.GetEnvironmentVariable("SYS_MODULE_INSTANCE_UID"); 
             _batchManagerAckUrl = Environment.GetEnvironmentVariable("SYS_BATCH_MANAGER_ACK_ENDPOINT");
             _batchManagerTokenUrl = Environment.GetEnvironmentVariable("SYS_BATCH_MANAGER_TOKEN_ENDPOINT");
         }
 
-        public HttpStatusCode SendOutputToken(Dictionary<string, string> handle, bool isFinal)
+        public HttpStatusCode SendOutputToken(string pinName, Dictionary<string, string> handle, string baseMsgUid, bool isFinal)
         {
             var xOutputToken = new OutputTokenMessage
             {
-                PinName = _pinName,
+                PinName = pinName,
                 SenderUid = _senderUid,
                 Values = JsonConvert.SerializeObject(handle),
-                BaseMsgUid = _baseMsgUid,
+                BaseMsgUid = baseMsgUid,
                 IsFinal = isFinal
             };
 
@@ -45,12 +41,12 @@ namespace ComputationModule.BalticLSC
             return result;
         }
 
-        public HttpStatusCode SendAckToken(bool isFailed = false, string note = null)
+        public HttpStatusCode SendAckToken(List<string> msgUids, bool isFailed = false, string note = null)
         {
             var ackToken = new TokensAck
             {
                 SenderUid = _senderUid,
-                MsgUids = new List<string> {_baseMsgUid},
+                MsgUids = msgUids,
                 IsFailed = isFailed,
                 Note = note
             };
