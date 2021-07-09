@@ -18,33 +18,16 @@ namespace ComputationModule.BalticLSC {
 		/// 
 		/// <param name="pinName"></param>
 		/// <param name="data"></param>
-		short SendData(string pinName, object data);
-
-		/// 
-		/// <param name="pinName"></param>
-		/// <param name="data"></param>
-		/// <param name="isFinal"></param>
-		short SendData(string pinName, object data, bool isFinal);
-
-		/// 
-		/// <param name="pinName"></param>
-		/// <param name="data"></param>
 		/// <param name="isFinal"></param>
 		/// <param name="msgUid"></param>
-		short SendData(string pinName, object data, bool isFinal, string msgUid);
-
-		/// 
-		/// <param name="pinName"></param>
-		/// <param name="values"></param>
-		/// <param name="isFinal"></param>
-		short SendToken(string pinName, object values, bool isFinal);
+		public short SendDataItem(string pinName, string data, bool isFinal = false, string msgUid = null);
 
 		/// 
 		/// <param name="pinName"></param>
 		/// <param name="values"></param>
 		/// <param name="isFinal"></param>
 		/// <param name="msgUid"></param>
-		short SendToken(string pinName, object values, bool isFinal, string msgUid);
+		short SendToken(string pinName, object values, bool isFinal, string msgUid = null);
 
 		short FinishProcessing();
 

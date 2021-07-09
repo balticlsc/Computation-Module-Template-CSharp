@@ -34,13 +34,14 @@ namespace ComputationModule.BalticLSC
                 throw new ArgumentException("Incorrect DataHandle.");
             if (!handle.TryGetValue("Collection", out string collectionName))
                 throw new ArgumentException("Incorrect DataHandle.");
-            
+
             Prepare(databaseName, collectionName);
-            
+
             var localPath = "";
             switch (PinConfiguration.DataMultiplicity)
             {
                 case DataMultiplicity.Single:
+                {
                     if (!handle.TryGetValue("ObjectId", out string id))
                         throw new ArgumentException("Incorrect DataHandle.");
                     try
@@ -64,9 +65,11 @@ namespace ComputationModule.BalticLSC
                         ClearLocal();
                         throw;
                     }
+
                     break;
-                
+                }
                 case DataMultiplicity.Multiple:
+                {
                     try
                     {
                         Log.Information($"Downloading all files from {collectionName}.");
@@ -87,8 +90,11 @@ namespace ComputationModule.BalticLSC
                         ClearLocal();
                         throw;
                     }
+
                     break;
+                }
             }
+
             return localPath;
         }
 
@@ -103,7 +109,7 @@ namespace ComputationModule.BalticLSC
                 throw new ArgumentException("Multiple data pin requires path pointing to a directory, not a file");
             if (DataMultiplicity.Single == PinConfiguration.DataMultiplicity && isDirectory)
                 throw new ArgumentException("Single data pin requires path pointing to a file, not a directory");
-            
+
             Dictionary<string, string> handle = null;
             try
             {
@@ -112,23 +118,25 @@ namespace ComputationModule.BalticLSC
                 switch (PinConfiguration.DataMultiplicity)
                 {
                     case DataMultiplicity.Single:
+                    {
                         Log.Information($"Uploading file from {localPath} to collection {collectionName}");
-                        
+
                         var bsonDocument = GetBsonDocument(localPath);
                         _mongoCollection.InsertOne(bsonDocument);
 
                         handle = GetTokenHandle(bsonDocument);
                         handle.Add("Database", databaseName);
                         handle.Add("Collection", collectionName);
-                        
+
                         Log.Information($"Upload file from {localPath} successful.");
                         break;
-                    
+                    }
                     case DataMultiplicity.Multiple:
+                    {
                         Log.Information($"Uploading directory from {localPath} to collection {collectionName}");
                         var files = GetAllFiles(localPath);
                         var handleList = new List<Dictionary<string, string>>();
-                        
+
                         foreach (var file in files)
                         {
                             var bsonDocument = GetBsonDocument(file.FullName);
@@ -145,7 +153,9 @@ namespace ComputationModule.BalticLSC
 
                         Log.Information($"Upload directory from {localPath} successful.");
                         break;
+                    }
                 }
+
                 return handle;
             }
             catch (Exception e)
@@ -189,7 +199,7 @@ namespace ComputationModule.BalticLSC
                 Log.Error($"Error {e} while trying to connect to MongoDB");
                 return -1;
             }
-            
+
             if ("input" == PinConfiguration.PinType && null != handle)
             {
                 if (!handle.TryGetValue("Database", out string databaseName))
@@ -236,11 +246,12 @@ namespace ComputationModule.BalticLSC
                               (null != id ? $" from collection {collectionName}" : ""));
                     return -3;
                 }
-            }     
+            }
+
             return 0;
         }
-        
-        private (string,string) Prepare(string databaseName = null, string collectionName = null)
+
+        private (string, string) Prepare(string databaseName = null, string collectionName = null)
         {
             databaseName ??= $"baltic_database_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
             collectionName ??= $"baltic_collection_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
@@ -250,7 +261,7 @@ namespace ComputationModule.BalticLSC
             _mongoCollection = _mongoDatabase.GetCollection<BsonDocument>(collectionName);
             return (databaseName, collectionName);
         }
-        
+
         private string DownloadSingleFile(BsonDocument document, string localPath)
         {
             var fileName = document.GetElement("fileName").Value.AsString;
@@ -294,6 +305,5 @@ namespace ComputationModule.BalticLSC
 
             return newHandle;
         }
-
     }
 }
