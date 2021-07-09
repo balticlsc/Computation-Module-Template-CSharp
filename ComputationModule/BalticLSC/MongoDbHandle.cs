@@ -4,10 +4,8 @@ using System.IO;
 using System.Net.Sockets;
 using ComputationModule.Messages;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Configuration;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -67,6 +65,7 @@ namespace ComputationModule.BalticLSC
                         throw;
                     }
                     break;
+                
                 case DataMultiplicity.Multiple:
                     try
                     {
@@ -97,35 +96,39 @@ namespace ComputationModule.BalticLSC
         {
             if ("input" == PinConfiguration.PinType)
                 throw new Exception("Upload cannot be called for input pins");
+            if (!File.Exists(localPath))
+                throw new ArgumentException($"Invalid path ({localPath})");
+            bool isDirectory = File.GetAttributes(localPath).HasFlag(FileAttributes.Directory);
+            if (DataMultiplicity.Multiple == PinConfiguration.DataMultiplicity && !isDirectory)
+                throw new ArgumentException("Multiple data pin requires path pointing to a directory, not a file");
+            if (DataMultiplicity.Single == PinConfiguration.DataMultiplicity && isDirectory)
+                throw new ArgumentException("Single data pin requires path pointing to a file, not a directory");
             
             Dictionary<string, string> handle = null;
             try
             {
                 (string databaseName, string collectionName) = Prepare();
 
-                switch (SourceDataMultiplicity)
+                switch (PinConfiguration.DataMultiplicity)
                 {
-                    case DataMultiplicity.Single when TargetDataMultiplicity == DataMultiplicity.Single:
-                    {
+                    case DataMultiplicity.Single:
                         Log.Information($"Uploading file from {localPath} to collection {collectionName}");
-                        UploadSingleFile(localPath, true);
+                        
+                        var bsonDocument = GetBsonDocument(localPath);
+                        _mongoCollection.InsertOne(bsonDocument);
+
+                        handle = GetTokenHandle(bsonDocument);
+                        handle.Add("Database", databaseName);
+                        handle.Add("Collection", collectionName);
+                        
                         Log.Information($"Upload file from {localPath} successful.");
                         break;
-                    }
-                    case DataMultiplicity.Single when TargetDataMultiplicity == DataMultiplicity.Multiple:
-                    {
-                        Log.Information($"Uploading file from {localPath} to collection {collectionName}");
-                        UploadSingleFile(localPath, true);
-                        Log.Information($"Upload file from {localPath} successful.");
-                        break;
-                    }
-                    case DataMultiplicity.Multiple when TargetDataMultiplicity == DataMultiplicity.Multiple:
-                    {
+                    
+                    case DataMultiplicity.Multiple:
                         Log.Information($"Uploading directory from {localPath} to collection {collectionName}");
                         var files = GetAllFiles(localPath);
                         var handleList = new List<Dictionary<string, string>>();
-                        handle = new Dictionary<string, string>();
-
+                        
                         foreach (var file in files)
                         {
                             var bsonDocument = GetBsonDocument(file.FullName);
@@ -133,28 +136,17 @@ namespace ComputationModule.BalticLSC
                             handleList.Add(GetTokenHandle(bsonDocument));
                         }
 
-
-                        handle.Add("Files", JsonConvert.SerializeObject(handleList));
-                        handle.Add("Database", databaseName);
-                        handle.Add("Collection", collectionName);
-
-                        SendOutputToken(handle, true);
-                        Log.Information($"Upload directory from {localPath} successful.");
-                        break;
-                    }
-                    case DataMultiplicity.Multiple when TargetDataMultiplicity == DataMultiplicity.Single:
-                    {
-                        Log.Information($"Uploading directory from {localPath} to collection {collectionName}");
-                        var files = GetAllFiles(localPath);
-                        for (var i = 0; i < files.Count; i++)
+                        handle = new Dictionary<string, string>
                         {
-                            UploadSingleFile(files[i].FullName, i == files.Count - 1);
-                        }
+                            {"Files", JsonConvert.SerializeObject(handleList)},
+                            {"Database", databaseName},
+                            {"Collection", collectionName}
+                        };
 
                         Log.Information($"Upload directory from {localPath} successful.");
                         break;
-                    }
                 }
+                return handle;
             }
             catch (Exception e)
             {
@@ -165,14 +157,12 @@ namespace ComputationModule.BalticLSC
             {
                 ClearLocal();
             }
-
-            return handle;
         }
 
         public override short CheckConnection(Dictionary<string, string> handle = null)
         {
-            var host = PinConfiguration.AccessCredential["Host"];
-            var port = PinConfiguration.AccessCredential["Port"];
+            string host = PinConfiguration.AccessCredential["Host"],
+                port = PinConfiguration.AccessCredential["Port"];
             try
             {
                 using var tcpClient = new TcpClient();
@@ -261,6 +251,18 @@ namespace ComputationModule.BalticLSC
             return (databaseName, collectionName);
         }
         
+        private string DownloadSingleFile(BsonDocument document, string localPath)
+        {
+            var fileName = document.GetElement("fileName").Value.AsString;
+            var fileContent = document.GetElement("fileContent").Value.AsBsonBinaryData;
+            var filePath = $"{localPath}/{fileName}";
+            using var fileStream = File.OpenWrite(filePath);
+            fileStream.Write(fileContent.Bytes);
+            fileStream.Dispose();
+
+            return filePath;
+        }
+
         private BsonDocument GetBsonDocument(string localPath)
         {
             var objectId = ObjectId.GenerateNewId();
@@ -292,6 +294,6 @@ namespace ComputationModule.BalticLSC
 
             return newHandle;
         }
-        
+
     }
 }
