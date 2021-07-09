@@ -233,7 +233,7 @@ namespace ComputationModule.BalticLSC {
 			_semaphore.Wait();
 			try
 			{
-				return _pins.FirstOrDefault(x => x.PinName == pinName);
+				return _pins.Find(x => x.PinName == pinName);
 			}
 			finally
 			{

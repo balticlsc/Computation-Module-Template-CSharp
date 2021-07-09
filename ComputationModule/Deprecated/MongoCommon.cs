@@ -6,7 +6,7 @@ using MongoDB.Driver;
 
 namespace ComputationModule.BalticLSC
 {
-    public abstract class MongoCommon : DataHandle
+    public abstract class MongoCommon : DataHandleOld
     {
         protected string ConnectionString;
         protected string Id;

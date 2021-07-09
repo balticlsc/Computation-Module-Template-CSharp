@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using ComputationModule.Messages;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace ComputationModule.BalticLSC
 {
@@ -13,7 +15,7 @@ namespace ComputationModule.BalticLSC
         public string AccessType;
         public DataMultiplicity DataMultiplicity;
         public TokenMultiplicity TokenMultiplicity;
-        public object AccessCredential;
+        public Dictionary<string,string> AccessCredential;
 
         public PinConfiguration(IConfigurationSection section)
         {
@@ -25,7 +27,8 @@ namespace ComputationModule.BalticLSC
                 section.GetValue<string>("DataMultiplicity"), true);
             TokenMultiplicity = (TokenMultiplicity)Enum.Parse(typeof(TokenMultiplicity),
                 section.GetValue<string>("TokenMultiplicity"), true);
-            //Load access credentials here, access credentials are based on data store which pin will access
+            AccessCredential = JsonConvert.DeserializeObject<Dictionary<string, string>>(
+                section.GetValue<string>("AccessCredential"));
         }
     }
 }

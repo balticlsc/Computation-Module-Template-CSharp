@@ -11,12 +11,12 @@ using Serilog;
 
 namespace ComputationModule.BalticLSC
 {
-    public class MongoDBHandle : MongoCommon
+    public class MongoDBHandleOld : MongoCommon
     {
         private string _collectionName;
         private IMongoCollection<BsonDocument> _mongoCollection;
 
-        public MongoDBHandle(Dictionary<string, string> handle, bool isTarget, IConfiguration configuration) : base(
+        public MongoDBHandleOld(Dictionary<string, string> handle, bool isTarget, IConfiguration configuration) : base(
             handle, isTarget, configuration)
         {
             var index = isTarget ? TargetIndex : SourceIndex;
@@ -197,7 +197,6 @@ namespace ComputationModule.BalticLSC
             }
 
             ClearLocal();
-            SendAckToken();
 
             return status;
         }

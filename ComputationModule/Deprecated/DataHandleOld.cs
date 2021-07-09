@@ -8,7 +8,7 @@ using Serilog;
 
 namespace ComputationModule.BalticLSC
 {
-    public abstract class DataHandle
+    public abstract class DataHandleOld
     {
         protected readonly string LocalPath;
         private const string BalticDataPath = "/BalticLSC/data";
@@ -29,7 +29,7 @@ namespace ComputationModule.BalticLSC
         public abstract bool Upload(string path);
         public abstract short CheckConnection();
 
-        protected DataHandle(IConfiguration configuration)
+        protected DataHandleOld(IConfiguration configuration)
         {
             LocalPath = Environment.GetEnvironmentVariable("LOCAL_TMP_PATH") ?? "/balticLSC_tmp";
 
@@ -84,7 +84,7 @@ namespace ComputationModule.BalticLSC
             }
         }
 
-        protected void SendOutputToken(Dictionary<string, string> handle, bool isFinal)
+        protected void SendOutputToken(string pinName, Dictionary<string, string> handle, string baseMsgUid, bool isFinal)
         {
             if (IsOutput)
             {
@@ -93,23 +93,11 @@ namespace ComputationModule.BalticLSC
 
             try
             {
-                var result = TokensProxy.SendOutputToken(handle, isFinal);
+                var result = TokensProxy.SendOutputToken(pinName, handle, baseMsgUid, isFinal);
             }
             catch (Exception e)
             {
                 Log.Error($"Error while sending output token: {e}");
-            }
-        }
-
-        protected void SendAckToken()
-        {
-            try
-            {
-                var result = TokensProxy.SendAckToken();
-            }
-            catch (Exception e)
-            {
-                Log.Error($"Error while sending ack token: {e}");
             }
         }
 

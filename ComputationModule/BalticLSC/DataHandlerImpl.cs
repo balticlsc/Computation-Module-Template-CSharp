@@ -10,7 +10,7 @@ namespace ComputationModule.BalticLSC
 	public class DataHandlerImpl : DataHandler
 	{
 
-		private Dictionary<string, DataHandle> _dataHandles;
+		private Dictionary<string, DataHandleOld> _dataHandles;
 		private TokensProxy _tokensProxy;
 		private JobRegistryImpl _registry;
 		private IConfiguration _configuration;
@@ -62,8 +62,8 @@ namespace ComputationModule.BalticLSC
 					(values, sizes) = _registry.GetPinValuesNDim(pinName);
 					List<Dictionary<string,string>> valuesObject = 
 						values.Select(v => string.IsNullOrEmpty(v) ? JsonConvert.DeserializeObject<Dictionary<string, string>>(v) : null).ToList();
-					List<MongoDBHandle> dbHandles =
-						valuesObject.Select(vo => null != vo ? new MongoDBHandle(vo, false, _configuration) : null).ToList();
+					List<MongoDBHandleOld> dbHandles =
+						valuesObject.Select(vo => null != vo ? new MongoDBHandleOld(vo, false, _configuration) : null).ToList();
 					List<string> dataItems = dbHandles.Select(h => h.Download().Item1).ToList();
 					return (dataItems, sizes);
 				default:
@@ -75,41 +75,24 @@ namespace ComputationModule.BalticLSC
 		/// 
 		/// <param name="pinName"></param>
 		/// <param name="data"></param>
-		public short SendData(string pinName, object data)
-		{
-
-			return 0;
-		}
-
-		/// 
-		/// <param name="pinName"></param>
-		/// <param name="data"></param>
-		/// <param name="isFinal"></param>
-		public short SendData(string pinName, object data, bool isFinal)
-		{
-
-			return 0;
-		}
-
-		/// 
-		/// <param name="pinName"></param>
-		/// <param name="data"></param>
 		/// <param name="isFinal"></param>
 		/// <param name="msgUid"></param>
-		public short SendData(string pinName, object data, bool isFinal, string msgUid)
+		public short SendDataItem(string pinName, string data, bool isFinal = false, string msgUid = null)
 		{
+			string accessType = _registry.GetPinConfiguration(pinName).AccessType;
 
-			return 0;
-		}
-
-		/// 
-		/// <param name="pinName"></param>
-		/// <param name="values"></param>
-		/// <param name="isFinal"></param>
-		public short SendToken(string pinName, object values, bool isFinal)
-		{
-
-			return 0;
+			switch (accessType)
+			{
+				case "Direct":
+					return SendToken(pinName, data, isFinal, msgUid);
+				case "MongoDB":
+					MongoDBHandleOld dbHandle = new MongoDBHandleOld(new Dictionary<string, string>(), true, _configuration);
+					dbHandle.TokensProxy = _tokensProxy;
+					return dbHandle.Upload(data) ? (short)0 : (short)-1;
+				default:
+					throw new NotImplementedException(
+						$"AccessType ({accessType}) not supported by the DataHandler, has to be handled manually");
+			}
 		}
 
 		/// 
@@ -117,7 +100,7 @@ namespace ComputationModule.BalticLSC
 		/// <param name="values"></param>
 		/// <param name="isFinal"></param>
 		/// <param name="msgUid"></param>
-		public short SendToken(string pinName, object values, bool isFinal, string msgUid)
+		public short SendToken(string pinName, object values, bool isFinal, string msgUid = null)
 		{
 
 			return 0;
