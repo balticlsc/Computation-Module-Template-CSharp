@@ -38,7 +38,7 @@ namespace ComputationModule.BalticLSC {
 
 		}
 
-		public abstract short CheckConnection();
+		public abstract short CheckConnection(Dictionary<string, string> handle = null);
 
 		/// 
 		/// <param name="handle"></param>
