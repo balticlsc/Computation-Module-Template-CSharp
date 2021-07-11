@@ -6,9 +6,9 @@ namespace ComputationModule.BalticLSC {
 
 		private string _pinName;
 		private TokenListener _listener;
-		private JobRegistryImpl _registry;
+		private JobRegistry _registry;
 
-		public JobThread(string pinName, TokenListener listener, JobRegistryImpl registry)
+		public JobThread(string pinName, TokenListener listener, JobRegistry registry)
 		{
 			_pinName = pinName;
 			_listener = listener;

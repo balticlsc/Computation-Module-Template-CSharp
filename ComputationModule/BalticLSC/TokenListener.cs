@@ -2,10 +2,10 @@ namespace ComputationModule.BalticLSC
 {
     public abstract class TokenListener
     {
-        protected JobRegistry Registry;
-        protected DataHandler Data;
+        protected IJobRegistry Registry;
+        protected IDataHandler Data;
 
-        public TokenListener(JobRegistry registry, DataHandler data)
+        public TokenListener(IJobRegistry registry, IDataHandler data)
         {
             Registry = registry;
             Data = data;

@@ -9,7 +9,7 @@ using Serilog;
 namespace ComputationModule.BalticLSC {
 	public abstract class DataHandle
 	{
-		protected PinConfiguration PinConfiguration;
+		protected readonly PinConfiguration PinConfiguration;
 		protected readonly string LocalPath;
 		
 		private const string BalticDataPath = "/BalticLSC/data";
@@ -19,7 +19,7 @@ namespace ComputationModule.BalticLSC {
 		/// 
 		/// <param name="pinName"></param>
 		/// <param name="configuration"></param>
-		public DataHandle(string pinName, IConfiguration configuration)
+		protected DataHandle(string pinName, IConfiguration configuration)
 		{
 			LocalPath = Environment.GetEnvironmentVariable("LOCAL_TMP_PATH") ?? "/balticLSC_tmp";
 

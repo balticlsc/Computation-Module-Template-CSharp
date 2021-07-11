@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using ComputationModule.Messages;
 using Microsoft.Extensions.Configuration;
@@ -30,9 +31,9 @@ namespace ComputationModule.BalticLSC
         {
             if ("input" != PinConfiguration.PinType)
                 throw new Exception("Download cannot be called for output pins");
-            if (!handle.TryGetValue("Database", out string databaseName))
+            if (!handle.TryGetValue("Database", out var databaseName))
                 throw new ArgumentException("Incorrect DataHandle.");
-            if (!handle.TryGetValue("Collection", out string collectionName))
+            if (!handle.TryGetValue("Collection", out var collectionName))
                 throw new ArgumentException("Incorrect DataHandle.");
 
             Prepare(databaseName, collectionName);
@@ -104,7 +105,7 @@ namespace ComputationModule.BalticLSC
                 throw new Exception("Upload cannot be called for input pins");
             if (!File.Exists(localPath))
                 throw new ArgumentException($"Invalid path ({localPath})");
-            bool isDirectory = File.GetAttributes(localPath).HasFlag(FileAttributes.Directory);
+            var isDirectory = File.GetAttributes(localPath).HasFlag(FileAttributes.Directory);
             if (DataMultiplicity.Multiple == PinConfiguration.DataMultiplicity && !isDirectory)
                 throw new ArgumentException("Multiple data pin requires path pointing to a directory, not a file");
             if (DataMultiplicity.Single == PinConfiguration.DataMultiplicity && isDirectory)
@@ -113,7 +114,7 @@ namespace ComputationModule.BalticLSC
             Dictionary<string, string> handle = null;
             try
             {
-                (string databaseName, string collectionName) = Prepare();
+                var (databaseName, collectionName) = Prepare();
 
                 switch (PinConfiguration.DataMultiplicity)
                 {
@@ -137,9 +138,8 @@ namespace ComputationModule.BalticLSC
                         var files = GetAllFiles(localPath);
                         var handleList = new List<Dictionary<string, string>>();
 
-                        foreach (var file in files)
+                        foreach (var bsonDocument in files.Select(file => GetBsonDocument(file.FullName)))
                         {
-                            var bsonDocument = GetBsonDocument(file.FullName);
                             _mongoCollection.InsertOne(bsonDocument);
                             handleList.Add(GetTokenHandle(bsonDocument));
                         }
@@ -202,9 +202,9 @@ namespace ComputationModule.BalticLSC
 
             if ("input" == PinConfiguration.PinType && null != handle)
             {
-                if (!handle.TryGetValue("Database", out string databaseName))
+                if (!handle.TryGetValue("Database", out var databaseName))
                     throw new ArgumentException("Incorrect DataHandle.");
-                if (!handle.TryGetValue("Collection", out string collectionName))
+                if (!handle.TryGetValue("Collection", out var collectionName))
                     throw new ArgumentException("Incorrect DataHandle.");
                 string id = null;
                 if (PinConfiguration.DataMultiplicity == DataMultiplicity.Single
@@ -253,8 +253,8 @@ namespace ComputationModule.BalticLSC
 
         private (string, string) Prepare(string databaseName = null, string collectionName = null)
         {
-            databaseName ??= $"baltic_database_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
-            collectionName ??= $"baltic_collection_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
+            databaseName ??= $"baltic_database_{Guid.NewGuid().ToString("N")[..8]}";
+            collectionName ??= $"baltic_collection_{Guid.NewGuid().ToString("N")[..8]}";
             //TODO to reset or not to reset
             _mongoClient = new MongoClient(_connectionString);
             _mongoDatabase = _mongoClient.GetDatabase(databaseName);
@@ -262,7 +262,7 @@ namespace ComputationModule.BalticLSC
             return (databaseName, collectionName);
         }
 
-        private string DownloadSingleFile(BsonDocument document, string localPath)
+        private static string DownloadSingleFile(BsonDocument document, string localPath)
         {
             var fileName = document.GetElement("fileName").Value.AsString;
             var fileContent = document.GetElement("fileContent").Value.AsBsonBinaryData;
@@ -274,7 +274,7 @@ namespace ComputationModule.BalticLSC
             return filePath;
         }
 
-        private BsonDocument GetBsonDocument(string localPath)
+        private static BsonDocument GetBsonDocument(string localPath)
         {
             var objectId = ObjectId.GenerateNewId();
             var fileStream = File.OpenRead(localPath);
@@ -295,7 +295,7 @@ namespace ComputationModule.BalticLSC
             return bsonDocument;
         }
 
-        private Dictionary<string, string> GetTokenHandle(BsonDocument document)
+        private static Dictionary<string, string> GetTokenHandle(BsonDocument document)
         {
             var newHandle = new Dictionary<string, string>()
             {

@@ -19,9 +19,9 @@ namespace ComputationModule.Controllers
         private Status _status;
         private long _progress;
         private List<JobTask> _jobTasks;
-        private JobRegistryImpl _registry;
+        private JobRegistry _registry;
         
-        public JobController(JobRegistryImpl registry)
+        public JobController(JobRegistry registry)
         {
             _registry = registry;
             _jobTasks = new List<JobTask>();

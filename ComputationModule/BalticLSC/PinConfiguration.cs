@@ -8,14 +8,13 @@ namespace ComputationModule.BalticLSC
 {
     public class PinConfiguration
     {
-        //Basic pin configuration, could be extended
-        public string PinName;
-        public string PinType;
-        public string IsRequired;
-        public string AccessType;
-        public DataMultiplicity DataMultiplicity;
-        public TokenMultiplicity TokenMultiplicity;
-        public Dictionary<string,string> AccessCredential;
+        public readonly string PinName;
+        public readonly string PinType;
+        public readonly string IsRequired;
+        public readonly string AccessType;
+        public readonly DataMultiplicity DataMultiplicity;
+        public readonly TokenMultiplicity TokenMultiplicity;
+        public readonly Dictionary<string,string> AccessCredential;
 
         public PinConfiguration(IConfigurationSection section)
         {
