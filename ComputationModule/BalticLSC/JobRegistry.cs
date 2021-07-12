@@ -10,6 +10,8 @@ using Serilog;
 namespace ComputationModule.BalticLSC {
 	public class JobRegistry : IJobRegistry {
 
+		private List<JobThread> _jobThreads;
+		
 		private Dictionary<string,List<InputTokenMessage>> _tokens;
 		private Dictionary<string, object> _variables;
 		private JobStatus _status;
@@ -27,12 +29,30 @@ namespace ComputationModule.BalticLSC {
 				Log.Error("Error while parsing configuration.");
 			}
 
+			_jobThreads = new List<JobThread>();
 			_tokens = new Dictionary<string, List<InputTokenMessage>>();
 			foreach (PinConfiguration pc in _pins.FindAll(p => "input" == p.PinType))
 				_tokens[pc.PinName] = new List<InputTokenMessage>();
 			_variables = new Dictionary<string, object>();
-			_status = new JobStatus();
+			_status = new JobStatus()
+			{
+				JobInstanceUid = Environment.GetEnvironmentVariable("SYS_MODULE_INSTANCE_UID")
+			};
 			_semaphore = new SemaphoreSlim(1,1);
+		}
+
+		public short RegisterThread(JobThread thread)
+		{
+			_semaphore.Wait();
+			try
+			{
+				_jobThreads.Add(thread);
+				return 0;
+			}
+			finally
+			{
+				_semaphore.Release();
+			}
 		}
 
 		/// 
@@ -197,6 +217,19 @@ namespace ComputationModule.BalticLSC {
 			}
 		}
 
+		public JobStatus GetJobStatus()
+		{
+			_semaphore.Wait();
+			try
+			{
+				return _status;
+			}
+			finally
+			{
+				_semaphore.Release();
+			}
+		}
+
 		/// 
 		/// <param name="name"></param>
 		/// <param name="value"></param>
@@ -293,6 +326,11 @@ namespace ComputationModule.BalticLSC {
 					tokens.Remove(message);
 				}
 			}
+		}
+
+		public void RegisterToken(InputTokenMessage msg)
+		{
+			_tokens[msg.PinName].Add(msg);
 		}
 
 	}

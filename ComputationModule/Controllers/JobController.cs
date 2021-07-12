@@ -15,84 +15,74 @@ namespace ComputationModule.Controllers
     [ApiController]
     [Route("/")]
     public class JobController : ControllerBase
-    {
-        private Status _status;
-        private long _progress;
-        private List<JobTask> _jobTasks;
+    { 
         private JobRegistry _registry;
-        
-        public JobController(JobRegistry registry)
+        private DataHandler _handler;
+        private TokenListener _listener;
+
+        public JobController(JobRegistry registry, DataHandler handler, TokenListener listener)
         {
             _registry = registry;
-            _jobTasks = new List<JobTask>();
+            _handler = handler;
+            _listener = listener;
         }
 
         [HttpPost]
         [Route("token")]
         public IActionResult ProcessTokenMessage([FromBody] object value)
         {
-            if (_status != Status.Failed)
+            try
             {
+                Log.Information($"Token message received: {value}");
+                var inputToken = JsonConvert.DeserializeObject<InputTokenMessage>(value.ToString() ?? "");
+                _registry.RegisterToken(inputToken);
                 try
                 {
-                    var inputToken = JsonConvert.DeserializeObject<InputTokenMessage>(value.ToString() ?? "");
-                    var tokens = new TokensProxy(inputToken.MsgUid, inputToken.PinName);
-                    try
+                    string retMessage;
+                    short result = _handler.CheckConnection(inputToken.PinName,
+                        JsonConvert.DeserializeObject<Dictionary<string, string>>(inputToken.Values));
+                    switch (result)
                     {
-                        var jobTask = new JobTask(_registry.GetPinConfiguration(inputToken.PinName),
-                            tokens, inputToken.Values);
-                        var result = jobTask.DataStoreProxy.CheckDataConnections();
-                        _jobTasks.Add(jobTask);
-                        var task = new Task(() => jobTask.StartDataProcessing());
-
-                        switch (result)
-                        {
-                            case 0:
-                                task.Start();
-                                return Ok();
-                            case 1:
-                                tokens.SendAckToken(true, $"Data store proxy no response.");
-                                return NotFound("no-response");
-                            case 2:
-                                tokens.SendAckToken(true, $"Data store proxy unauthorized.");
-                                return Ok("ok-bad-dataset");
-                            case 3:
-                                tokens.SendAckToken(true, $"Data store proxy invalid path: {inputToken.Values}.");
-                                return Ok("ok-bad-dataset");
-                        }
-
-                        return BadRequest();
+                        case 0:
+                            JobThread jobThread = new JobThread(inputToken.PinName, _listener, _registry, _handler);
+                            _registry.RegisterThread(jobThread);
+                            var task = new Task(() => jobThread.Run());
+                            task.Start();
+                            return Ok();
+                        case -1:
+                            retMessage = $"No response ({inputToken.PinName}).";
+                            Log.Error(retMessage);
+                            return NotFound(retMessage);
+                        case -2:
+                            retMessage = $"Unauthorized ({inputToken.PinName}).";
+                            Log.Error(retMessage);
+                            return Unauthorized(retMessage);
+                        case -3:
+                            retMessage = $"Invalid path ({inputToken.PinName}.";
+                            Log.Error(retMessage);
+                            return Unauthorized(retMessage);
                     }
-                    catch (Exception e)
-                    {
-                        Log.Error($"Error of type {e.GetType()}: {e.Message}\n{e.StackTrace}");
-                        tokens.SendAckToken(true, e.Message);
-                        return Ok(e);
-                    }
+
+                    return BadRequest();
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Corrupted token: {e.Message}");
-                    return BadRequest(e);
+                    Log.Error($"Error of type {e.GetType()}: {e.Message}\n{e.StackTrace}");
+                    return Ok(e);
                 }
             }
-
-            return StatusCode(503);
+            catch (Exception e)
+            {
+                Log.Error($"Corrupted token: {e.Message}");
+                return BadRequest(e);
+            }
         }
 
         [HttpGet]
         [Route("/status")]
         public IActionResult GetStatus()
         {
-            //Update overall job progress and job status based on status and progress of each job task
-            var jobStatus = new JobStatus
-            {
-                JobInstanceUid = Environment.GetEnvironmentVariable("SYS_MODULE_INSTANCE_UID"),
-                JobProgress = _progress,
-                Status = _status
-            };
-
-            return Ok(jobStatus);
+           return Ok(_registry.GetJobStatus());
         }
     }
 }

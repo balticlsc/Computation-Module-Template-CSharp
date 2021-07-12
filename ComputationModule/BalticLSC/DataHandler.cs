@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection.Metadata;
+using ComputationModule.Messages;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
@@ -11,7 +12,7 @@ namespace ComputationModule.BalticLSC
 	public class DataHandler : IDataHandler
 	{
 
-		private Dictionary<string, DataHandleOld> _dataHandles;
+		private Dictionary<string, DataHandle> _dataHandles;
 		private readonly TokensProxy _tokensProxy;
 		private readonly JobRegistry _registry;
 		private readonly IConfiguration _configuration;
@@ -24,7 +25,7 @@ namespace ComputationModule.BalticLSC
 			_registry = registry;
 			_tokensProxy = new TokensProxy();
 			_configuration = configuration;
-			_dataHandles = new Dictionary<string, DataHandleOld>();
+			_dataHandles = new Dictionary<string, DataHandle>();
 		}
 
 		public string ObtainDataItem(string pinName)
@@ -53,25 +54,20 @@ namespace ComputationModule.BalticLSC
 		/// <param name="pinName"></param>
 		public (List<string>, long[]) ObtainDataItemsNDim(string pinName)
 		{
-			string accessType = _registry.GetPinConfiguration(pinName).AccessType;
-
-			switch (accessType)
+			try
 			{
-				case "Direct":
-					return _registry.GetPinValuesNDim(pinName);
-				case "MongoDB":
-					List<string> values;
-					long[] sizes;
-					(values, sizes) = _registry.GetPinValuesNDim(pinName);
-					List<Dictionary<string,string>> valuesObject = 
-						values.Select(v => !string.IsNullOrEmpty(v) ? JsonConvert.DeserializeObject<Dictionary<string, string>>(v) : null).ToList();
-					MongoDbHandle dbHandle = new MongoDbHandle(pinName, _configuration);
-					List<string> dataItems = valuesObject.Select(vo => null != vo ?  dbHandle.Download(vo): null).ToList();
-					//TODO tokens
-					return (dataItems, sizes);
-				default:
-					throw new NotImplementedException(
-						$"AccessType ({accessType}) not supported by the DataHandler, has to be handled manually");
+				List<string> values;
+				long[] sizes;
+				(values, sizes) = _registry.GetPinValuesNDim(pinName);
+				List<Dictionary<string,string>> valuesObject = 
+					values.Select(v => !string.IsNullOrEmpty(v) ? JsonConvert.DeserializeObject<Dictionary<string, string>>(v) : null).ToList();
+				DataHandle dHandle = GetDataHandle(pinName);
+				List<string> dataItems = valuesObject.Select(vo => null != vo ? dHandle.Download(vo): null).ToList();
+				return (dataItems, sizes);
+			}
+			catch (ArgumentException e)
+			{
+				return _registry.GetPinValuesNDim(pinName);
 			}
 		}
 
@@ -82,20 +78,15 @@ namespace ComputationModule.BalticLSC
 		/// <param name="msgUid"></param>
 		public short SendDataItem(string pinName, string data, bool isFinal, string msgUid = null)
 		{
-			string accessType = _registry.GetPinConfiguration(pinName).AccessType;
-
-			switch (accessType)
+			try
 			{
-				case "Direct":
-					return SendToken(pinName, data, isFinal, msgUid);
-				case "MongoDB":
-					MongoDbHandle dbHandle = new MongoDbHandle(pinName, _configuration);
-					Dictionary<string,string> newHandle = dbHandle.Upload(data);
-					//TODO tokens
-					return 0;
-				default:
-					throw new NotImplementedException(
-						$"AccessType ({accessType}) not supported by the DataHandler, has to be handled manually");
+				DataHandle dHandle = GetDataHandle(pinName);
+				Dictionary<string,string> newHandle = dHandle.Upload(data);
+				return SendToken(pinName, newHandle, isFinal, msgUid);
+			}
+			catch (ArgumentException e)
+			{
+				return SendToken(pinName, data, isFinal, msgUid);
 			}
 		}
 
@@ -119,13 +110,20 @@ namespace ComputationModule.BalticLSC
 		public short FinishProcessing()
 		{
 			List<string> msgUids = _registry.GetAllMsgUids();
+			_registry.SetStatus(Status.Completed);
 			return SendAckToken(msgUids, true);
 		}
 
 		public short FailProcessing(string note)
 		{
 			List<string> msgUids = _registry.GetAllMsgUids();
-			return HttpStatusCode.OK == _tokensProxy.SendAckToken(msgUids, true, true, note) ? (short)0 : (short)-1;
+			_registry.SetStatus(Status.Failed);
+			if (HttpStatusCode.OK == _tokensProxy.SendAckToken(msgUids, true, true, note))
+			{
+				_registry.ClearMessages(msgUids);
+				return 0;
+			}
+			return -1;
 		}
 
 		/// 
@@ -146,20 +144,38 @@ namespace ComputationModule.BalticLSC
 		/// <param name="handle"></param>
 		public short CheckConnection(string pinName, Dictionary<string,string> handle = null)
 		{
-			string accessType = _registry.GetPinConfiguration(pinName).AccessType;
+			try
+			{
+				DataHandle dHandle = GetDataHandle(pinName);
+				return dHandle.CheckConnection(handle);
+			}
+			catch (ArgumentException e)
+			{
+				throw new ArgumentException(
+					$"Cannot check connection for a pin of type \"Direct\"");
+			}
+		}
 
+		private DataHandle GetDataHandle(string pinName)
+		{
+			if (_dataHandles.ContainsKey(pinName))
+				return _dataHandles[pinName];
+			string accessType = _registry.GetPinConfiguration(pinName).AccessType;
+			DataHandle handle;
 			switch (accessType)
 			{
 				case "Direct":
 					throw new ArgumentException(
-						$"Cannot check connection for a pin of type \"Direct\"");
+						$"Cannot create a data handle for a pin of type \"Direct\"");
 				case "MongoDB":
-					MongoDbHandle dbHandle = new MongoDbHandle(pinName, _configuration);
-					return dbHandle.CheckConnection(handle);
+					handle = new MongoDbHandle(pinName, _configuration);
+					break;
 				default:
 					throw new NotImplementedException(
 						$"AccessType ({accessType}) not supported by the DataHandler, has to be handled manually");
 			}
+			_dataHandles[pinName] = handle;
+			return handle;
 		}
 
 	}
