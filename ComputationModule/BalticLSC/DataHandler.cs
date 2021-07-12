@@ -65,7 +65,7 @@ namespace ComputationModule.BalticLSC
 				List<string> dataItems = valuesObject.Select(vo => null != vo ? dHandle.Download(vo): null).ToList();
 				return (dataItems, sizes);
 			}
-			catch (ArgumentException e)
+			catch (ArgumentException)
 			{
 				return _registry.GetPinValuesNDim(pinName);
 			}
@@ -84,7 +84,7 @@ namespace ComputationModule.BalticLSC
 				Dictionary<string,string> newHandle = dHandle.Upload(data);
 				return SendToken(pinName, newHandle, isFinal, msgUid);
 			}
-			catch (ArgumentException e)
+			catch (ArgumentException)
 			{
 				return SendToken(pinName, data, isFinal, msgUid);
 			}
@@ -149,7 +149,7 @@ namespace ComputationModule.BalticLSC
 				DataHandle dHandle = GetDataHandle(pinName);
 				return dHandle.CheckConnection(handle);
 			}
-			catch (ArgumentException e)
+			catch (ArgumentException)
 			{
 				throw new ArgumentException(
 					$"Cannot check connection for a pin of type \"Direct\"");
