@@ -254,5 +254,46 @@ namespace ComputationModule.BalticLSC {
 			}
 		}
 
+		public string GetBaseMsgUid()
+		{
+			_semaphore.Wait();
+			try
+			{
+				return _tokens.Values.ToList().Find(ltm => 0 != ltm.Count)?.FirstOrDefault()?.MsgUid;
+			}
+			finally
+			{
+				_semaphore.Release();
+			}
+		}
+
+		public List<string> GetAllMsgUids()
+		{
+			_semaphore.Wait();
+			try
+			{
+				return _tokens.Values.ToList().SelectMany(it => it).
+					Select(it => it.MsgUid).ToList();
+			}
+			finally
+			{
+				_semaphore.Release();
+			}
+		}
+
+		public void ClearMessages(List<string> msgUids)
+		{
+			foreach (string msgUid in msgUids)
+			{
+				List<InputTokenMessage> tokens = _tokens.Values.ToList().
+					Find(l => l.Exists(it => msgUid == it.MsgUid));
+				if (null != tokens)
+				{
+					InputTokenMessage message = tokens.Find(it => msgUid == it.MsgUid);
+					tokens.Remove(message);
+				}
+			}
+		}
+
 	}
 }

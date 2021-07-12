@@ -27,7 +27,7 @@ namespace ComputationModule.BalticLSC {
 		/// <param name="values"></param>
 		/// <param name="isFinal"></param>
 		/// <param name="msgUid"></param>
-		short SendToken(string pinName, object values, bool isFinal, string msgUid = null);
+		short SendToken(string pinName, string values, bool isFinal, string msgUid = null);
 
 		short FinishProcessing();
 

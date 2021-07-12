@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection.Metadata;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -98,37 +99,67 @@ namespace ComputationModule.BalticLSC
 			}
 		}
 
+		public short SendToken(string pinName, Dictionary<string,string> handle, bool isFinal, string msgUid = null)
+		{
+			return SendToken(pinName, JsonConvert.SerializeObject(handle), isFinal, msgUid);
+		}
+
 		/// 
 		/// <param name="pinName"></param>
 		/// <param name="values"></param>
 		/// <param name="isFinal"></param>
 		/// <param name="msgUid"></param>
-		public short SendToken(string pinName, object values, bool isFinal, string msgUid = null)
+		public short SendToken(string pinName, string values, bool isFinal, string msgUid = null)
 		{
-
-			return 0;
+			if (null == msgUid)
+				msgUid = _registry.GetBaseMsgUid();
+			return HttpStatusCode.OK == _tokensProxy.SendOutputToken(pinName, values, msgUid, isFinal) ? (short)0 : (short)-1;
 		}
 
 		public short FinishProcessing()
 		{
+			List<string> msgUids = _registry.GetAllMsgUids();
+			return SendAckToken(msgUids, true);
+		}
 
-			return 0;
+		public short FailProcessing(string note)
+		{
+			List<string> msgUids = _registry.GetAllMsgUids();
+			return HttpStatusCode.OK == _tokensProxy.SendAckToken(msgUids, true, true, note) ? (short)0 : (short)-1;
 		}
 
 		/// 
 		/// <param name="msgUids"></param>
 		/// <param name="isFinal"></param>
-		public short SendAckToken(List<string> msgUids, bool isFinal) {
-
-			return 0;
+		public short SendAckToken(List<string> msgUids, bool isFinal)
+		{
+			if (HttpStatusCode.OK == _tokensProxy.SendAckToken(msgUids, isFinal))
+			{
+				_registry.ClearMessages(msgUids);
+				return 0;
+			}
+			return -1;
 		}
 
 		/// 
 		/// <param name="pinName"></param>
-		public short CheckConnection(string pinName)
+		/// <param name="handle"></param>
+		public short CheckConnection(string pinName, Dictionary<string,string> handle = null)
 		{
+			string accessType = _registry.GetPinConfiguration(pinName).AccessType;
 
-			return 0;
+			switch (accessType)
+			{
+				case "Direct":
+					throw new ArgumentException(
+						$"Cannot check connection for a pin of type \"Direct\"");
+				case "MongoDB":
+					MongoDbHandle dbHandle = new MongoDbHandle(pinName, _configuration);
+					return dbHandle.CheckConnection(handle);
+				default:
+					throw new NotImplementedException(
+						$"AccessType ({accessType}) not supported by the DataHandler, has to be handled manually");
+			}
 		}
 
 	}

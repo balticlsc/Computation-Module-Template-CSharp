@@ -23,13 +23,13 @@ namespace ComputationModule.BalticLSC
             _batchManagerTokenUrl = Environment.GetEnvironmentVariable("SYS_BATCH_MANAGER_TOKEN_ENDPOINT");
         }
 
-        public HttpStatusCode SendOutputToken(string pinName, Dictionary<string, string> handle, string baseMsgUid, bool isFinal)
+        public HttpStatusCode SendOutputToken(string pinName, string values, string baseMsgUid, bool isFinal)
         {
             var xOutputToken = new OutputTokenMessage
             {
                 PinName = pinName,
                 SenderUid = _senderUid,
-                Values = JsonConvert.SerializeObject(handle),
+                Values = values,
                 BaseMsgUid = baseMsgUid,
                 IsFinal = isFinal
             };
@@ -41,12 +41,13 @@ namespace ComputationModule.BalticLSC
             return result;
         }
 
-        public HttpStatusCode SendAckToken(List<string> msgUids, bool isFailed = false, string note = null)
+        public HttpStatusCode SendAckToken(List<string> msgUids, bool isFinal, bool isFailed = false, string note = null)
         {
             var ackToken = new TokensAck
             {
                 SenderUid = _senderUid,
                 MsgUids = msgUids,
+                IsFinal = isFinal,
                 IsFailed = isFailed,
                 Note = note
             };
