@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Text;
+using ComputationModule.BalticLSC;
+using ComputationModule.Module;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -33,6 +35,9 @@ namespace ComputationModule
             services.AddMvc();
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddControllers().AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+            services.AddSingleton<JobRegistry,JobRegistry>();
+            services.AddSingleton<DataHandler,DataHandler>();
+            services.AddScoped<TokenListener,MyTokenListener>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
