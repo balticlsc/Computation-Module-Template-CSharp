@@ -10,6 +10,11 @@
   <ItemGroup>
     <Compile Remove="logs\**" />
     <Content Remove="logs\**" />
+    <Content Include="obj\Debug\netcoreapp3.1\ComputationModule.dll" />
+    <Content Include="obj\Debug\netcoreapp3.1\ComputationModule.exe" />
+    <Content Include="obj\Debug\netcoreapp3.1\ComputationModule.genruntimeconfig.cache" />
+    <Content Include="obj\Debug\netcoreapp3.1\ComputationModule.pdb" />
+    <Content Include="obj\Debug\netcoreapp3.1\ComputationModule.RazorTargetAssemblyInfo.cache" />
     <EmbeddedResource Remove="logs\**" />
     <None Remove="logs\**" />
   </ItemGroup>
@@ -37,6 +42,10 @@
     <PackageReference Include="Serilog.Sinks.Literate" Version="3.0.1-dev-00044" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.1-dev-00771" />
     <PackageReference Include="SSH.NET" Version="2020.0.0-beta1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Properties\launchSettings.json" />
   </ItemGroup>
 
 

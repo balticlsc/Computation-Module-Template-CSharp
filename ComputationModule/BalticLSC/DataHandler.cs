@@ -82,17 +82,12 @@ namespace ComputationModule.BalticLSC
 			{
 				DataHandle dHandle = GetDataHandle(pinName);
 				Dictionary<string,string> newHandle = dHandle.Upload(data);
-				return SendToken(pinName, newHandle, isFinal, msgUid);
+				return SendToken(pinName, JsonConvert.SerializeObject(newHandle), isFinal, msgUid);
 			}
 			catch (ArgumentException)
 			{
 				return SendToken(pinName, data, isFinal, msgUid);
 			}
-		}
-
-		public short SendToken(string pinName, Dictionary<string,string> handle, bool isFinal, string msgUid = null)
-		{
-			return SendToken(pinName, JsonConvert.SerializeObject(handle), isFinal, msgUid);
 		}
 
 		/// 
