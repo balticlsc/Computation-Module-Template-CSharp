@@ -1,0 +1,26 @@
+﻿[{ "PinName": "Image Folder",
+  "PinType": "input",
+  "AccessType": "MongoDB",
+  "DataMultiplicity": "multiple",
+  "TokenMultiplicity": "single",
+  "AccessCredential": {
+    "User": "someuser",
+    "Password": "somepass",
+    "Port": "27017",
+    "Host": "b-36a1a684-51a8"
+  }
+  },
+  { "PinName": "Images",
+    "PinType": "output",
+    "AccessType": "FTP",
+    "DataMultiplicity": "single",
+    "TokenMultiplicity": "multiple",
+    "AccessCredential": {
+      "Host": "ftp.somehost.com",
+      "User": "someuser",
+      "Password": "somepass"
+    },
+    "AccessPath": {
+      "ResourcePath": "/files/out"
+    }
+  }]
