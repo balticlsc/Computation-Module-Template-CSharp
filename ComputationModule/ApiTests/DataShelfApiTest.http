@@ -1,0 +1,30 @@
+﻿
+###
+POST http://localhost:80/token
+Content-Type: application/json
+
+{
+  "MsgUid": "b-fdeaccff-e219-401b-bb3d-aaa508b40116",
+  "PinName": "Image Folder",
+  "Values":  "{\"Database\": \"Image_channel_separator\", \"Collection\": \"Image_channel_separator_b-8b0e36\", \"ObjectId\": \"60254938cf19c15519cdff71\"}",
+  "TokenSeqStack": []
+}
+
+###
+PUT https://localhost:5001/task/dataset
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJycm9zemN6eWsiLCJlbWFpbCI6InJhZG9zbGF3LnJvc3pjenlrQGVlLnB3LmVkdS5wbCIsImp0aSI6IjhmMWY0MmMwLTQ2MjgtNGRhYS05ZDdiLTI1NmJjYzQ4MzNlZSIsImV4cCI6MTU5MTkxNDM1NywiaXNzIjoid3V0LmJhbHRpY2xzYy5ldSIsImF1ZCI6Ind1dC5iYWx0aWNsc2MuZXUifQ.uAZJn416MvhJxO8Uo78q0mpEwASqodVKtEvXCH00dGM
+Content-Type: application/json
+
+{
+  "name": "My First Film 2.0",
+  "dataTypeUid": "dd-002-000",
+  "multiplicity": 0,
+  "accessTypeUid": "dd-004-001",
+  "values": "{\"MyFilm1\"}"
+}
+
+###
+DELETE https://localhost:5001/task/dataset?datasetuid=fab36fd3-e7ef-4da7-9b2a-713c6009bae3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJycm9zemN6eWsiLCJlbWFpbCI6InJhZG9zbGF3LnJvc3pjenlrQGVlLnB3LmVkdS5wbCIsImp0aSI6IjhmMWY0MmMwLTQ2MjgtNGRhYS05ZDdiLTI1NmJjYzQ4MzNlZSIsImV4cCI6MTU5MTkxNDM1NywiaXNzIjoid3V0LmJhbHRpY2xzYy5ldSIsImF1ZCI6Ind1dC5iYWx0aWNsc2MuZXUifQ.uAZJn416MvhJxO8Uo78q0mpEwASqodVKtEvXCH00dGM
+
+

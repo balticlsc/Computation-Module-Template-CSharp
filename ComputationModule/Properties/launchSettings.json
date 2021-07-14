@@ -6,7 +6,8 @@
       "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development",
           "SYS_PIN_CONFIG_FILE_PATH": "pins_configs.json"
-      }
+      },
+      "applicationUrl": "http://localhost:80"
     }
   }
 }

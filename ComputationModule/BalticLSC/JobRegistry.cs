@@ -27,6 +27,7 @@ namespace ComputationModule.BalticLSC {
 			catch (Exception)
 			{
 				Log.Error("Error while parsing configuration.");
+				throw;
 			}
 
 			_jobThreads = new List<JobThread>();

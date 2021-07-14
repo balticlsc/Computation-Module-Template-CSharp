@@ -26,8 +26,9 @@ namespace ComputationModule.BalticLSC
                 section.GetValue<string>("DataMultiplicity"), true);
             TokenMultiplicity = (TokenMultiplicity)Enum.Parse(typeof(TokenMultiplicity),
                 section.GetValue<string>("TokenMultiplicity"), true);
-            AccessCredential = JsonConvert.DeserializeObject<Dictionary<string, string>>(
-                section.GetValue<string>("AccessCredential"));
+            AccessCredential = new Dictionary<string, string>();
+            foreach (IConfigurationSection aSection in section.GetSection("AccessCredential").GetChildren())
+                AccessCredential.Add(aSection.Key,aSection.Value);
         }
     }
 }

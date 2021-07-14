@@ -9,7 +9,7 @@ namespace ComputationModule.BalticLSC
     {
         public static List<PinConfiguration> GetPinsConfiguration(IConfiguration configuration)
         {
-            var pinsSections = configuration.GetSection("Pins").GetChildren().ToList();
+            var pinsSections = configuration.GetSection("Pins").GetChildren();
             return pinsSections.Select(configurationSection => new PinConfiguration(configurationSection)).ToList();
         }
     }
