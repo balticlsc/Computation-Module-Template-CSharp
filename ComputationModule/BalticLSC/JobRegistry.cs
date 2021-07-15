@@ -65,7 +65,7 @@ namespace ComputationModule.BalticLSC {
 			{
 				if (0 == _tokens[pinName].Count)
 					return Status.Idle;
-				if (TokenMultiplicity.Single == GetPinConfiguration(pinName).TokenMultiplicity)
+				if (TokenMultiplicity.Single == GetPinConfigurationInternal(pinName).TokenMultiplicity)
 					return Status.Completed;
 				InputTokenMessage finalToken =
 					_tokens[pinName].Find(t => !t.TokenSeqStack.ToList().Exists(s => !s.IsFinal));
@@ -120,7 +120,7 @@ namespace ComputationModule.BalticLSC {
 				
 				// Single token pin:
 
-				if (TokenMultiplicity.Single == GetPinConfiguration(pinName).TokenMultiplicity)
+				if (TokenMultiplicity.Single == GetPinConfigurationInternal(pinName).TokenMultiplicity)
 					return (new List<string>() {_tokens[pinName].FirstOrDefault().Values}, null);
 				
 				// Multiple token pin:
@@ -267,12 +267,17 @@ namespace ComputationModule.BalticLSC {
 			_semaphore.Wait();
 			try
 			{
-				return _pins.Find(x => x.PinName == pinName);
+				return GetPinConfigurationInternal(pinName);
 			}
 			finally
 			{
 				_semaphore.Release();
 			}
+		}
+		
+		private PinConfiguration GetPinConfigurationInternal(string pinName)
+		{
+			return _pins.Find(x => x.PinName == pinName);
 		}
 
 		public List<string> GetStrongPinNames()
