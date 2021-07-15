@@ -41,7 +41,7 @@ namespace ComputationModule.BalticLSC
             return result;
         }
 
-        public HttpStatusCode SendAckToken(List<string> msgUids, bool isFinal, bool isFailed = false, string note = null)
+        public HttpStatusCode SendAckToken(List<string> msgUids, bool isFinal, bool isFailed = false, string note = "")
         {
             var ackToken = new TokensAck
             {

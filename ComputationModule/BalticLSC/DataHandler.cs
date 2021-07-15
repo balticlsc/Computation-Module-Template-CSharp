@@ -78,16 +78,11 @@ namespace ComputationModule.BalticLSC
 		/// <param name="msgUid"></param>
 		public short SendDataItem(string pinName, string data, bool isFinal, string msgUid = null)
 		{
-			try
-			{
-				DataHandle dHandle = GetDataHandle(pinName);
-				Dictionary<string,string> newHandle = dHandle.Upload(data);
-				return SendToken(pinName, JsonConvert.SerializeObject(newHandle), isFinal, msgUid);
-			}
-			catch (ArgumentException)
-			{
+			if("Direct" == _registry.GetPinConfiguration(pinName).AccessType)
 				return SendToken(pinName, data, isFinal, msgUid);
-			}
+			DataHandle dHandle = GetDataHandle(pinName);
+			Dictionary<string,string> newHandle = dHandle.Upload(data);
+			return SendToken(pinName, JsonConvert.SerializeObject(newHandle), isFinal, msgUid);
 		}
 
 		/// 
@@ -147,7 +142,7 @@ namespace ComputationModule.BalticLSC
 			catch (ArgumentException)
 			{
 				throw new ArgumentException(
-					$"Cannot check connection for a pin of type \"Direct\"");
+					"Cannot check connection for a pin of type \"Direct\"");
 			}
 		}
 
@@ -161,7 +156,7 @@ namespace ComputationModule.BalticLSC
 			{
 				case "Direct":
 					throw new ArgumentException(
-						$"Cannot create a data handle for a pin of type \"Direct\"");
+						"Cannot create a data handle for a pin of type \"Direct\"");
 				case "MongoDB":
 					handle = new MongoDbHandle(pinName, _configuration);
 					break;
