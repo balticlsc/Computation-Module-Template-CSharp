@@ -103,7 +103,7 @@ namespace ComputationModule.BalticLSC
         {
             if ("input" == PinConfiguration.PinType)
                 throw new Exception("Upload cannot be called for input pins");
-            if (!File.Exists(localPath))
+            if (!File.Exists(localPath) && !Directory.Exists(localPath))
                 throw new ArgumentException($"Invalid path ({localPath})");
             var isDirectory = File.GetAttributes(localPath).HasFlag(FileAttributes.Directory);
             if (DataMultiplicity.Multiple == PinConfiguration.DataMultiplicity && !isDirectory)

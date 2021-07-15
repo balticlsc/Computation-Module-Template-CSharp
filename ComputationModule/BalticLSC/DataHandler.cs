@@ -78,7 +78,7 @@ namespace ComputationModule.BalticLSC
 		/// <param name="msgUid"></param>
 		public short SendDataItem(string pinName, string data, bool isFinal, string msgUid = null)
 		{
-			if("Direct" == _registry.GetPinConfiguration(pinName).AccessType)
+			if ("Direct" == _registry.GetPinConfiguration(pinName).AccessType)
 				return SendToken(pinName, data, isFinal, msgUid);
 			DataHandle dHandle = GetDataHandle(pinName);
 			Dictionary<string,string> newHandle = dHandle.Upload(data);
