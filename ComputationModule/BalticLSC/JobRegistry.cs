@@ -74,7 +74,7 @@ namespace ComputationModule.BalticLSC {
 					long maxCount = 1;
 					foreach (SeqToken token in finalToken.TokenSeqStack)
 						maxCount *= token.No + 1;
-					if (maxCount == _tokens[pinName].Count)
+					if (_tokens[pinName].Count == maxCount)
 						return Status.Completed;
 				}
 
@@ -260,6 +260,11 @@ namespace ComputationModule.BalticLSC {
 			{
 				_semaphore.Release();
 			}
+		}
+
+		public string GetEnvironmentVariable(string name)
+		{
+			return Environment.GetEnvironmentVariable(name);
 		}
 
 		public PinConfiguration GetPinConfiguration(string pinName)

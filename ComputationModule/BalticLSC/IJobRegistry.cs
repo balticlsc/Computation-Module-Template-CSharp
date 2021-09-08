@@ -42,6 +42,10 @@ namespace ComputationModule.BalticLSC {
 		/// 
 		/// <param name="name"></param>
 		object GetVariable(string name);
+		
+		/// 
+		/// <param name="name"></param>
+		string GetEnvironmentVariable(string name);
 	}
 
 }
