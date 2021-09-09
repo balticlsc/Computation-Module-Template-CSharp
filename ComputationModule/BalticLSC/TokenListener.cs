@@ -5,7 +5,7 @@ namespace ComputationModule.BalticLSC
         protected IJobRegistry Registry;
         protected IDataHandler Data;
 
-        public TokenListener(IJobRegistry registry, IDataHandler data)
+        public TokenListener(JobRegistry registry, DataHandler data)
         {
             Registry = registry;
             Data = data;

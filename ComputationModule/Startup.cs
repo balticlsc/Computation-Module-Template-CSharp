@@ -35,9 +35,7 @@ namespace ComputationModule
             services.AddMvc();
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddControllers().AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
-            services.AddSingleton<IJobRegistry,JobRegistry>();
             services.AddSingleton<JobRegistry,JobRegistry>();
-            services.AddSingleton<IDataHandler,DataHandler>();
             services.AddSingleton<DataHandler,DataHandler>();
             services.AddScoped<TokenListener,MyTokenListener>();
         }

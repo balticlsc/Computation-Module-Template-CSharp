@@ -1,10 +1,13 @@
-﻿using ComputationModule.BalticLSC;
+﻿using System.IO;
+using ComputationModule.BalticLSC;
+using ComputationModule.Messages;
+using Serilog;
 
 namespace ComputationModule.Module
 {
     public class MyTokenListener : TokenListener
     {
-        public MyTokenListener(IJobRegistry registry, IDataHandler data) : base(registry, data) {}
+        public MyTokenListener(JobRegistry registry, DataHandler data) : base(registry, data) {}
         
         public override void DataReceived(string pinName)
         {

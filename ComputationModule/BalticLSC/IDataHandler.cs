@@ -20,7 +20,7 @@ namespace ComputationModule.BalticLSC {
 		/// <param name="data"></param>
 		/// <param name="isFinal"></param>
 		/// <param name="msgUid"></param>
-		public short SendDataItem(string pinName, string data, bool isFinal, string msgUid = null);
+		short SendDataItem(string pinName, string data, bool isFinal, string msgUid = null);
 
 		/// 
 		/// <param name="pinName"></param>
