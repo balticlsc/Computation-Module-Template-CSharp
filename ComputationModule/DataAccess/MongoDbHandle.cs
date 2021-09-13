@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using ComputationModule.BalticLSC;
 using ComputationModule.Messages;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
@@ -10,7 +11,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json;
 using Serilog;
 
-namespace ComputationModule.BalticLSC
+namespace ComputationModule.DataAccess
 {
     public class MongoDbHandle : DataHandle
     {

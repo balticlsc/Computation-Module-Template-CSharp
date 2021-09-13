@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ComputationModule.DataModel;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 

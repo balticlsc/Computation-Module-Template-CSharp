@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection.Metadata;
+using ComputationModule.ApiAccess;
+using ComputationModule.DataAccess;
 using ComputationModule.Messages;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
+using ComputationModule.DataModel;
 using ComputationModule.Messages;
 using Microsoft.Extensions.Configuration;
 using Serilog;
