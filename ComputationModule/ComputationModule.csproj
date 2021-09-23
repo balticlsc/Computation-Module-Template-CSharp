@@ -5,6 +5,7 @@
     <LangVersion>8.0</LangVersion>
     <UserSecretsId>4570f4e5-8162-41f9-8eb9-d69340158fb4</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,6 +43,7 @@
     <PackageReference Include="Serilog.Sinks.Literate" Version="3.0.1-dev-00044" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.1-dev-00771" />
     <PackageReference Include="SSH.NET" Version="2020.0.0-beta1" />
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0-rc.1.21451.13" />
   </ItemGroup>
 
   <ItemGroup>
