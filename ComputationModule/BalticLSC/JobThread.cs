@@ -1,5 +1,6 @@
 using System;
 using ComputationModule.Messages;
+using Serilog;
 
 namespace ComputationModule.BalticLSC {
 	public class JobThread
@@ -44,6 +45,7 @@ namespace ComputationModule.BalticLSC {
 			}
 			catch (Exception e)
 			{
+				Log.Error($"Error of type {e.GetType()}: {e.Message}\n{e.StackTrace}");
 				_handler.FailProcessing(e.Message);
 			}
 		}
