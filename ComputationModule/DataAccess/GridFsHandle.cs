@@ -14,14 +14,14 @@ using Serilog;
 
 namespace ComputationModule.DataAccess
 {
-    public class MongoDbHandle : DataHandle
+    public class GridFsHandle : DataHandle
     {
         private readonly string _connectionString;
         private IMongoClient _mongoClient;
         private IMongoDatabase _mongoDatabase;
         private IGridFSBucket _mongoBucket;
 
-        public MongoDbHandle(string pinName, IConfiguration configuration) : base(pinName, configuration)
+        public GridFsHandle(string pinName, IConfiguration configuration) : base(pinName, configuration)
         {
             _connectionString = $"mongodb://{PinConfiguration.AccessCredential["User"]}" +
                                 $":{PinConfiguration.AccessCredential["Password"]}" +

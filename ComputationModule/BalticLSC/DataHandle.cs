@@ -67,6 +67,12 @@ namespace ComputationModule.BalticLSC {
 				Log.Error($"Error while clearing local memory: {e}");
 			}
 		}
+		
+		protected string GetRemotePathFromLocalPath(string localPath)
+		{
+			var name = Path.GetFileName(localPath);
+			return Path.Combine(BalticDataPath, GetNameWithGuid(name));
+		}
 
 		protected void AddGuidToFilesName(string directoryPath)
 		{
