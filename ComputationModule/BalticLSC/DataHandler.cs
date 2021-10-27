@@ -162,6 +162,9 @@ namespace ComputationModule.BalticLSC
 				case "MongoDB":
 					handle = new MongoDbHandle(pinName, _configuration);
 					break;
+				case "GridFS":
+					handle = new GridFsHandle(pinName, _configuration);
+					break;
 				default:
 					throw new NotImplementedException(
 						$"AccessType ({accessType}) not supported by the DataHandler, has to be handled manually");
