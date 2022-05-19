@@ -103,19 +103,19 @@ namespace ComputationModule.BalticLSC
 		/// <param name="sourcePin"></param>
 		/// <param name="targetPin"></param>
 		/// <param name="isFinal"></param>
-        public bool ForwardTokenValues(string sourcePin, string targetPin, string msgUid = null)
-        {
-            var (values, _) = _registry.GetPinValuesNDim(sourcePin);
+		public bool ForwardTokenValues(string sourcePin, string targetPin, string msgUid = null)
+		{
+			var (values, _) = _registry.GetPinValuesNDim(sourcePin);
 
-            var isSuccess = true;
+			var isSuccess = true;
 
-            for (var i = 0; i < values.Count; ++i)
-            {
-                isSuccess &= SendToken(targetPin, values[i], i == values.Count - 1, msgUid) == default(short);
-            }
+			for (var i = 0; i < values.Count; ++i)
+			{
+				isSuccess &= SendToken(targetPin, values[i], i == values.Count - 1, msgUid) == default(short);
+			}
 
-            return isSuccess;
-        }
+			return isSuccess;
+		}
 
 		public short FinishProcessing()
 		{
