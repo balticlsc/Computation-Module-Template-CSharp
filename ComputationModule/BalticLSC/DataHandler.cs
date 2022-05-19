@@ -99,6 +99,24 @@ namespace ComputationModule.BalticLSC
 			return HttpStatusCode.OK == _tokensProxy.SendOutputToken(pinName, values, msgUid, isFinal) ? (short)0 : (short)-1;
 		}
 
+		/// Pass token values from source pin to target pin.
+		/// <param name="sourcePin"></param>
+		/// <param name="targetPin"></param>
+		/// <param name="isFinal"></param>
+		public bool ForwardTokenValues(string sourcePin, string targetPin, string msgUid = null)
+		{
+			var (values, _) = _registry.GetPinValuesNDim(sourcePin);
+
+			var isSuccess = true;
+
+			for (var i = 0; i < values.Count; ++i)
+			{
+				isSuccess &= SendToken(targetPin, values[i], i == values.Count - 1, msgUid) == default(short);
+			}
+
+			return isSuccess;
+		}
+
 		public short FinishProcessing()
 		{
 			List<string> msgUids = _registry.GetAllMsgUids();

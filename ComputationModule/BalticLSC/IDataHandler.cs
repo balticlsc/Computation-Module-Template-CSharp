@@ -29,6 +29,12 @@ namespace ComputationModule.BalticLSC {
 		/// <param name="msgUid"></param>
 		short SendToken(string pinName, string values, bool isFinal, string msgUid = null);
 
+		/// Pass token values from source pin to target pin.
+		/// <param name="sourcePin"></param>
+		/// <param name="targetPin"></param>
+		/// <param name="isFinal"></param>
+		bool ForwardTokenValues(string sourcePin, string targetPin, string msgUid = null);
+
 		short FinishProcessing();
 
 		/// 
