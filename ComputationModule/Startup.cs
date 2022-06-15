@@ -20,7 +20,7 @@ namespace ComputationModule
             var pinsArray = File.ReadAllText(pinsConfigurationPath);
             var pins = "{ \"Pins\":" + pinsArray + "}";
             var bytes = Encoding.ASCII.GetBytes(pins);
-            var pinStream = new MemoryStream(bytes);
+            using var pinStream = new MemoryStream(bytes);
             var configurationBuilder = new ConfigurationBuilder()
                 .AddJsonStream(pinStream);
 
