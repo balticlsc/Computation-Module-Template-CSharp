@@ -278,9 +278,9 @@ namespace ComputationModule.DataAccess
         private static BsonDocument GetBsonDocument(string localPath)
         {
             var objectId = ObjectId.GenerateNewId();
-            var fileStream = File.OpenRead(localPath);
+            using var fileStream = File.OpenRead(localPath);
             var fileName = new FileInfo(localPath).Name;
-            var memoryStream = new MemoryStream();
+            using var memoryStream = new MemoryStream();
             fileStream.CopyTo(memoryStream);
             var fileByteArray = memoryStream.ToArray();
 
